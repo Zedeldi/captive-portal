@@ -3,10 +3,6 @@
 INTERFACE="wlo1"
 SSID="CAPTIVE_PORTAL"
 GATEWAY="10.0.0.1"
-DHCP_START="10.0.0.10"
-DHCP_END="10.0.0.250"
-NETMASK="255.255.255.0"
-DHCP_LEASE="12h"
 
 if [[ $EUID != 0 ]]; then
     echo "This program must be run as root."
@@ -18,27 +14,15 @@ systemctl stop NetworkManager
 
 echo "Starting AP..."
 create_ap \
+    -g "$GATEWAY" \
     --no-virt \
-    --no-dnsmasq \
+    --redirect-to-localhost \
+    --logfile "$PWD/create_ap.log" \
+    --dns-logfile "$PWD/dnsmasq.log" \
     --daemon \
     -n "$INTERFACE" "$SSID"
 
 sleep 2
-
-echo "Configuring IP..."
-ifconfig "$INTERFACE" "$GATEWAY"
-
-echo "Starting DNS/DHCP server..."
-dnsmasq \
-    --listen-address="::1,127.0.0.1,$GATEWAY" \
-    --interface="$INTERFACE" \
-    --bind-interfaces \
-    --dhcp-option="3,$GATEWAY" \
-    --dhcp-option="6,$GATEWAY" \
-    --dhcp-range="$DHCP_START,$DHCP_END,$NETMASK,$DHCP_LEASE" \
-    --log-queries \
-    --log-facility="$PWD/dnsmasq.log" \
-    --address="/#/$GATEWAY"
 
 echo "Starting HTTP server..."
 python main.py "$GATEWAY" 80
@@ -46,7 +30,6 @@ python main.py "$GATEWAY" 80
 echo -e "Exiting, please wait..."
 
 echo "Stopping processes..."
-pkill dnsmasq
 pkill create_ap
 
 sleep 5
