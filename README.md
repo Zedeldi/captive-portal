@@ -41,6 +41,7 @@ If the configured NIC is managed by another application, the relevant service ma
 - [linux-wifi-hotspot](https://github.com/lakinduakash/linux-wifi-hotspot) - Wi-Fi hotspot
 - [Flask](https://pypi.org/project/Flask/) - HTTP interface
   - [Bootstrap](https://getbootstrap.com/) - CSS framework (bundled)
+  - [Feather](https://feathericons.com/) - default logo (bundled)
 
 ## License
 
