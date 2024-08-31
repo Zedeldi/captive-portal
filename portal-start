@@ -4,7 +4,7 @@ INTERFACE="wlo1"
 SSID="CAPTIVE_PORTAL"
 GATEWAY="10.0.0.1"
 
-if [[ $EUID != 0 ]]; then
+if [[ ${EUID} != 0 ]]; then
     echo "This program must be run as root."
     exit 1
 fi
@@ -14,20 +14,20 @@ systemctl stop NetworkManager
 
 echo "Starting AP..."
 create_ap \
-    -g "$GATEWAY" \
+    -g "${GATEWAY}" \
     --no-virt \
     --redirect-to-localhost \
-    --logfile "$PWD/create_ap.log" \
-    --dns-logfile "$PWD/dnsmasq.log" \
+    --logfile "${PWD}/create_ap.log" \
+    --dns-logfile "${PWD}/dnsmasq.log" \
     --daemon \
-    -n "$INTERFACE" "$SSID"
+    -n "${INTERFACE}" "${SSID}"
 
 sleep 2
 
 echo "Starting HTTP server..."
-python main.py "$GATEWAY" 80
+python main.py "${GATEWAY}" 80
 
-echo -e "Exiting, please wait..."
+echo "Exiting, please wait..."
 
 echo "Stopping processes..."
 pkill create_ap
